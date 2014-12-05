@@ -45,6 +45,7 @@ public class ForecastFragment extends Fragment {
         super.onCreate(savedInstanceState);
         //Add this in order for this fregment to handle menu events.
         setHasOptionsMenu(true);
+
     }
 
     @Override
