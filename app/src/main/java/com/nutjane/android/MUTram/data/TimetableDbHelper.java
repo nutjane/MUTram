@@ -77,6 +77,7 @@ public class TimetableDbHelper extends SQLiteOpenHelper {
 
             try{
                 while((readLine = br.readLine())!=null){
+
                     String[] str = readLine.split(",");
                     String SQL_INSERT_DATA = "INSERT INTO "+TimetableEntry.TABLE_NAME
                             + " ("+ TimetableEntry.COLUMN_TRAM_ID

@@ -85,10 +85,10 @@ public class TimetableProvider extends ContentProvider {
                 Log.d(LOG_TAG, "ACCESS FILE");
 
                 String readLine = null;
-                readLine = br.readLine(); //skip first line
 
                 try{
                     while((readLine = br.readLine())!=null){
+//                        Log.d(LOG_TAG, "> "+readLine);
                         String[] str = readLine.split(",");
                         String SQL_INSERT_DATA = "INSERT INTO "+ TABLE_NAME
                                 + " (tram_id, tram_name, time) VALUES ('"

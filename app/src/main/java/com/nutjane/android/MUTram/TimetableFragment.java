@@ -36,6 +36,10 @@ import android.widget.Toast;
 
 import com.nutjane.android.MUTram.data.TimetableProvider;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link android.widget.ListView} layout.
  */
@@ -45,12 +49,26 @@ public class
     public static final String LOG_TAG = TimetableFragment.class.getSimpleName();
 
 
-    private ForecastAdapter mForecastAdapter;
 
     private ListView mListView;
-    private TextView mtextWelcome;
+
+    private TextView mtextBlueArrival;
+    private TextView mtextBlueArrivalNext;
+    private TextView mtextRedArrival;
+    private TextView mtextRedArrivalNext;
+    private TextView mtextGreenArrival;
+    private TextView mtextGreenArrivalNext;
+
+    private TextView mtextPrefLocation;
+
     private int mPosition = ListView.INVALID_POSITION;
     private boolean mUseTodayLayout;
+
+    //for keep value of time
+    private ArrayList<String> line1 = new ArrayList<String>();
+    private ArrayList<String> line2 = new ArrayList<String>();
+    private ArrayList<String> line3 = new ArrayList<String>();
+
 
     private static final String SELECTED_KEY = "selected_position";
 
@@ -74,14 +92,8 @@ public class
             R.id.list_item_tram_desc,
             R.id.list_item_time};
 
+    public static String[] timeTramCome = new String[6];
 
-
-    // These indices are tied to TIMETABLE_COLUMN.  If TIMETABLE_COLUMN changes, these
-    // must change.
-    public static final int COL_TRAM_IDtable = 0;
-    public static final int COL_TRAM_ID = 1;
-    public static final int COL_TRAM_NAME = 2;
-    public static final int COL_TRAM_TIME = 3;
 
 
     /**
@@ -137,22 +149,30 @@ public class
 
         Log.d(LOG_TAG, "IN CREATEVIEW");
 
-        mtextWelcome = (TextView) rootView.findViewById(R.id.main_welcome);
-        String a = "WELCOME";
-        mtextWelcome.setText(a);
-        Log.d(LOG_TAG, "WELCOME");
-
-
-
-
         getLoaderManager().initLoader(0,null,this);
 
 
         String URL = "content://com.nutjane.android.MUTram/timetable";
         Uri uri = Uri.parse(URL);
-        Cursor c = getActivity().getContentResolver().query(uri,null,null,null,null);
+        Cursor c = getActivity().getContentResolver().query(uri, null, null, null, null);
         if (c.moveToFirst()) {
             do{
+                if(c.getString(c.getColumnIndex(TimetableProvider.TRAM_ID)).equals("1")){ // #1
+                    line1.add(c.getString(c.getColumnIndex(TimetableProvider.TIME)));
+                    Toast.makeText(getActivity(),"add to line1",Toast.LENGTH_LONG).show();
+
+                }
+                else if(c.getString(c.getColumnIndex(TimetableProvider.TRAM_ID)).equals("2")){ // #1
+                    line2.add(c.getString(c.getColumnIndex(TimetableProvider.TIME)));
+                    Toast.makeText(getActivity(),"add to line2",Toast.LENGTH_LONG).show();
+
+                }
+                else if(c.getString(c.getColumnIndex(TimetableProvider.TRAM_ID)).equals("3")){ // #1
+                    line3.add(c.getString(c.getColumnIndex(TimetableProvider.TIME)));
+                    Toast.makeText(getActivity(),"add to line3",Toast.LENGTH_LONG).show();
+
+                }
+
                 Toast.makeText(getActivity(),
                         c.getString(c.getColumnIndex(TimetableProvider._ID)) +
                                 ", " + c.getString(c.getColumnIndex(TimetableProvider.TRAM_ID)) +
@@ -161,115 +181,19 @@ public class
                         Toast.LENGTH_SHORT).show();
             } while (c.moveToNext());
         }
-//        ListView mListview = (ListView)rootView.findViewById(R.id.listview_forecast);
-//
-//        SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(context,
-//                R.layout.list_item_forecast,
-//                null,
-//                TIMETABLE_COLUMN,
-//                mToFields,
-//                0);
-//        mListview.setAdapter(mAdapter);
 
 
+        mLocation = Utility.getPreferredLocation(getActivity());
+        mtextPrefLocation = (TextView) rootView.findViewById(R.id.main_pref_location);
+        mtextPrefLocation.setText(mLocation);
+        calculation(1,line1,0);
+        calculation(2,line2,2);
+        calculation(3,line3,4);
 
-
-//        Cursor cursor = context.getApplicationContext().getContentResolver().query(
-//                TimetableContract.TimetableEntry.CONTENT_URI,
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//        Log.d(LOG_TAG, "CURSOR ADDED");
-//
-//        String test = cursor.getString(TimetableFragment.COL_TRAM_NAME);
-//        Log.d(LOG_TAG, test);
-
-
-
-
-//        //The arrayAdapter will take data from a source and
-//        //use it to populate the ListView it's attached to.
-//        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
-
-        /*// The SimpleCursorAdapter will take data from the database through the
-        // Loader and use it to populate the ListView it's attached to.
-        mForecastAdapter = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.list_item_forecast,
-                null,
-                // the column names to use to fill the textviews
-                new String[]{WeatherEntry.COLUMN_DATETEXT,
-                        WeatherEntry.COLUMN_SHORT_DESC,
-                        WeatherEntry.COLUMN_MAX_TEMP,
-                        WeatherEntry.COLUMN_MIN_TEMP
-                },
-                // the textviews to fill with the data pulled from the columns above
-                new int[]{R.id.list_item_date_textview,
-                        R.id.list_item_forecast_textview,
-                        R.id.list_item_high_textview,
-                        R.id.list_item_low_textview
-                },
-                0
-        );
-
-        mForecastAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                boolean isMetric = Utility.isMetric(getActivity());
-                switch (columnIndex) {
-                    case COL_WEATHER_MAX_TEMP:
-                    case COL_WEATHER_MIN_TEMP: {
-                        // we have to do some formatting and possibly a conversion
-                        ((TextView) view).setText(Utility.formatTemperature(
-                                cursor.getDouble(columnIndex), isMetric));
-                        return true;
-                    }
-                    case COL_WEATHER_DATE: {
-                        String dateString = cursor.getString(columnIndex);
-                        TextView dateView = (TextView) view;
-                        dateView.setText(Utility.formatDate(dateString));
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-        */
-
-
-//        // Get a reference to the ListView, and attach this adapter to it.
-//        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
-//        mListView.setAdapter(mForecastAdapter);
-//
-//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                Cursor cursor = mForecastAdapter.getCursor();
-//                if (cursor != null && cursor.moveToPosition(position)) {
-//                    ((Callback)getActivity())
-//                            .onItemSelected(cursor.getString(COL_TRAM_ID));
-//                }
-//                mPosition = position;
-//            }
-//        });
-//
-//        // If there's instance state, mine it for useful information.
-//        // The end-goal here is that the user never knows that turning their device sideways
-//        // does crazy lifecycle related things.  It should feel like some stuff stretched out,
-//        // or magically appeared to take advantage of room, but data or place in the app was never
-//        // actually *lost*.
-//        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-//            // The listview probably hasn't even been populated yet.  Actually perform the
-//            // swapout in onLoadFinished.
-//            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-//        }
-//
-//        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
-//
-
+        mtextBlueArrival = (TextView) rootView.findViewById(R.id.blueLine_arrival);
+        mtextBlueArrival.setText(timeTramCome[0]);
+        mtextBlueArrivalNext = (TextView) rootView.findViewById(R.id.blueLine_arrival_next);
+        mtextBlueArrivalNext.setText(timeTramCome[1]);
 
         return rootView;
     }
@@ -279,6 +203,62 @@ public class
         getLoaderManager().initLoader(TIMETABLE_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
+
+    private void changeLocation(){
+
+        mLocation = Utility.getPreferredLocation(getActivity());
+        mtextPrefLocation = (TextView) getView().findViewById(R.id.main_pref_location);
+        mtextPrefLocation.setText(mLocation);
+        calculation(1,line1,0);
+        calculation(2,line2,2);
+        calculation(3,line3,4);
+        mtextBlueArrival = (TextView) getView().findViewById(R.id.blueLine_arrival);
+        mtextBlueArrival.setText(timeTramCome[0]);
+        mtextBlueArrivalNext = (TextView) getView().findViewById(R.id.blueLine_arrival_next);
+        mtextBlueArrivalNext.setText(timeTramCome[1]);
+
+    }
+
+    private void calculation(int tramID, ArrayList<String> line, int st){
+
+
+        //nowTime
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        Calendar calNow = Calendar.getInstance();
+        Calendar calTramCome = Calendar.getInstance();
+
+
+        int addLine = Integer.parseInt(Utility.getPreferredAddtimeTram(getActivity(),tramID));
+        int position=0;
+        int amountLoop = line.size();
+        for(int i=0;i<amountLoop;i++) {
+            String[] time = line.get(i).split(":");
+            calTramCome.set(Calendar.HOUR,Integer.parseInt(time[0]));
+            calTramCome.set(Calendar.MINUTE,Integer.parseInt(time[1]));
+//                System.out.println("T "+i+" "+calTramCome.getTime());
+            calTramCome.add(Calendar.MINUTE, addLine);
+//                System.out.println("Ta"+i+" "+calTramCome.getTime());
+            if (calTramCome.after(calNow)) {
+                position = i;
+                break;
+            }
+        }
+
+//            System.out.println(df.format(calTramCome.getTime()));
+        timeTramCome[st] = (df.format(calTramCome.getTime()));
+        Log.d(LOG_TAG, st + ": " +timeTramCome[st]);
+        String[] time = line.get(position+1).split(":");
+        calTramCome.set(Calendar.HOUR,Integer.parseInt(time[0]));
+        calTramCome.set(Calendar.MINUTE,Integer.parseInt(time[1]));
+        calTramCome.add(Calendar.MINUTE, addLine);
+        timeTramCome[st+1]=(df.format(calTramCome.getTime()));
+        Log.d(LOG_TAG, st + ": " +timeTramCome[st+1]);
+//            System.out.println(df.format(calTramCome.getTime()));
+
+
+
+    }
+
 
     private void updateWeather() {
         //normal
@@ -342,6 +322,7 @@ public class
         super.onResume();
         if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
             getLoaderManager().restartLoader(TIMETABLE_LOADER, null, this);
+            changeLocation();
         }
     }
 
@@ -400,6 +381,7 @@ public class
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
 //        mForecastAdapter.swapCursor(data);
 //        if (mPosition != ListView.INVALID_POSITION) {
 //            // If we don't need to restart the loader, and there's a desired position to restore
@@ -410,7 +392,7 @@ public class
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mForecastAdapter.swapCursor(null);
+//        mForecastAdapter.swapCursor(null);
     }
 
 
