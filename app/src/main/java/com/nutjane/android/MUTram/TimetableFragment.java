@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.sunshine;
+package com.nutjane.android.MUTram;
 
-import android.content.Intent;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,66 +30,59 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.android.sunshine.data.WeatherContract;
-import com.example.android.sunshine.data.WeatherContract.LocationEntry;
-import com.example.android.sunshine.data.WeatherContract.WeatherEntry;
-import com.example.android.sunshine.sync.SunshineSyncAdapter;
-
-import java.util.Date;
+import com.nutjane.android.MUTram.data.TimetableProvider;
 
 /**
  * Encapsulates fetching the forecast and displaying it as a {@link android.widget.ListView} layout.
  */
-public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor> {
+public class
+        TimetableFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
-    public static final String LOG_TAG = ForecastFragment.class.getSimpleName();
+    public static final String LOG_TAG = TimetableFragment.class.getSimpleName();
+
 
     private ForecastAdapter mForecastAdapter;
 
     private ListView mListView;
+    private TextView mtextWelcome;
     private int mPosition = ListView.INVALID_POSITION;
     private boolean mUseTodayLayout;
 
     private static final String SELECTED_KEY = "selected_position";
 
-    private static final int FORECAST_LOADER = 0;
+    private static final int TIMETABLE_LOADER = 0;
     private String mLocation;
+    Context context;
 
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
-    private static final String[] FORECAST_COLUMNS = {
+    private static final String[] TIMETABLE_COLUMN = {
             // In this case the id needs to be fully qualified with a table name, since
             // the content provider joins the location & weather tables in the background
             // (both have an _id column)
             // On the one hand, that's annoying.  On the other, you can search the weather table
             // using the location set by the user, which is only in the Location table.
             // So the convenience is worth it.
-            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
-            WeatherEntry.COLUMN_DATETEXT,
-            WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherEntry.COLUMN_MIN_TEMP,
-            LocationEntry.COLUMN_LOCATION_SETTING,
-            WeatherEntry.COLUMN_WEATHER_ID,
-            LocationEntry.COLUMN_COORD_LAT,
-            LocationEntry.COLUMN_COORD_LONG
+            "tram_id","tram_name","time"
     };
 
+    public static final int[] mToFields = { R.id.list_item_tram_name,
+            R.id.list_item_tram_desc,
+            R.id.list_item_time};
 
-    // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
+
+
+    // These indices are tied to TIMETABLE_COLUMN.  If TIMETABLE_COLUMN changes, these
     // must change.
-    public static final int COL_WEATHER_ID = 0;
-    public static final int COL_WEATHER_DATE = 1;
-    public static final int COL_WEATHER_DESC = 2;
-    public static final int COL_WEATHER_MAX_TEMP = 3;
-    public static final int COL_WEATHER_MIN_TEMP = 4;
-    public static final int COL_LOCATION_SETTING = 5;
-    public static final int COL_WEATHER_CONDITION_ID = 6;
-    public static final int COL_COORD_LAT = 7;
-    public static final int COL_COORD_LONG = 8;
+    public static final int COL_TRAM_IDtable = 0;
+    public static final int COL_TRAM_ID = 1;
+    public static final int COL_TRAM_NAME = 2;
+    public static final int COL_TRAM_TIME = 3;
+
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -104,7 +97,7 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
     }
 
 
-    public ForecastFragment() {
+    public TimetableFragment() {
     }
 
     @Override
@@ -129,20 +122,76 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
             updateWeather();
             return true;
         }*/
-        if (id == R.id.action_map) {
+        /*if (id == R.id.action_map) {
             openPreferredLocationInMap();
             return true;
-        }
+        }*/
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        //The arrayAdapter will take data from a source and
-        //use it to populate the ListView it's attached to.
-        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        Log.d(LOG_TAG, "IN CREATEVIEW");
+
+        mtextWelcome = (TextView) rootView.findViewById(R.id.main_welcome);
+        String a = "WELCOME";
+        mtextWelcome.setText(a);
+        Log.d(LOG_TAG, "WELCOME");
+
+
+
+
+        getLoaderManager().initLoader(0,null,this);
+
+
+        String URL = "content://com.nutjane.android.MUTram/timetable";
+        Uri uri = Uri.parse(URL);
+        Cursor c = getActivity().getContentResolver().query(uri,null,null,null,null);
+        if (c.moveToFirst()) {
+            do{
+                Toast.makeText(getActivity(),
+                        c.getString(c.getColumnIndex(TimetableProvider._ID)) +
+                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TRAM_ID)) +
+                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TRAM_NAME)) +
+                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TIME)),
+                        Toast.LENGTH_SHORT).show();
+            } while (c.moveToNext());
+        }
+//        ListView mListview = (ListView)rootView.findViewById(R.id.listview_forecast);
+//
+//        SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(context,
+//                R.layout.list_item_forecast,
+//                null,
+//                TIMETABLE_COLUMN,
+//                mToFields,
+//                0);
+//        mListview.setAdapter(mAdapter);
+
+
+
+
+//        Cursor cursor = context.getApplicationContext().getContentResolver().query(
+//                TimetableContract.TimetableEntry.CONTENT_URI,
+//                null,
+//                null,
+//                null,
+//                null
+//        );
+//        Log.d(LOG_TAG, "CURSOR ADDED");
+//
+//        String test = cursor.getString(TimetableFragment.COL_TRAM_NAME);
+//        Log.d(LOG_TAG, test);
+
+
+
+
+//        //The arrayAdapter will take data from a source and
+//        //use it to populate the ListView it's attached to.
+//        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         /*// The SimpleCursorAdapter will take data from the database through the
         // Loader and use it to populate the ListView it's attached to.
@@ -189,38 +238,37 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
         });
         */
 
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // Get a reference to the ListView, and attach this adapter to it.
-        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        mListView.setAdapter(mForecastAdapter);
-
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Cursor cursor = mForecastAdapter.getCursor();
-                if (cursor != null && cursor.moveToPosition(position)) {
-                    ((Callback)getActivity())
-                            .onItemSelected(cursor.getString(COL_WEATHER_DATE));
-                }
-                mPosition = position;
-            }
-        });
-
-        // If there's instance state, mine it for useful information.
-        // The end-goal here is that the user never knows that turning their device sideways
-        // does crazy lifecycle related things.  It should feel like some stuff stretched out,
-        // or magically appeared to take advantage of room, but data or place in the app was never
-        // actually *lost*.
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            // The listview probably hasn't even been populated yet.  Actually perform the
-            // swapout in onLoadFinished.
-            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-        }
-
-        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
-
+//        // Get a reference to the ListView, and attach this adapter to it.
+//        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
+//        mListView.setAdapter(mForecastAdapter);
+//
+//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+//                Cursor cursor = mForecastAdapter.getCursor();
+//                if (cursor != null && cursor.moveToPosition(position)) {
+//                    ((Callback)getActivity())
+//                            .onItemSelected(cursor.getString(COL_TRAM_ID));
+//                }
+//                mPosition = position;
+//            }
+//        });
+//
+//        // If there's instance state, mine it for useful information.
+//        // The end-goal here is that the user never knows that turning their device sideways
+//        // does crazy lifecycle related things.  It should feel like some stuff stretched out,
+//        // or magically appeared to take advantage of room, but data or place in the app was never
+//        // actually *lost*.
+//        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+//            // The listview probably hasn't even been populated yet.  Actually perform the
+//            // swapout in onLoadFinished.
+//            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+//        }
+//
+//        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+//
 
 
         return rootView;
@@ -228,14 +276,14 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+        getLoaderManager().initLoader(TIMETABLE_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     private void updateWeather() {
         //normal
-        //String location = Utility.getPreferredLocation(getActivity());
-        //new FetchWeatherTask(getActivity()).execute(location);
+//        String location = Utility.getPreferredLocation(getActivity());
+//        new FetchTimetableTask(getActivity()).execute(location);
 
         /// use service
         /*Intent intent = new Intent(getActivity(), SunshineService.class);
@@ -260,40 +308,40 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
         new FetchWeatherTask(getActivity()).execute(location);*/
 
         //use complete syncAdapter
-        SunshineSyncAdapter.syncImmediately(getActivity());
+        //SunshineSyncAdapter.syncImmediately(getActivity());
 
     }
 
-    private void openPreferredLocationInMap() {
-        // Using the URI scheme for showing a location found on a map.  This super-handy
-        // intent can is detailed in the "Common Intents" page of Android's developer site:
-        // http://developer.android.com/guide/components/intents-common.html#Maps
-        if ( null != mForecastAdapter ) {
-            Cursor c = mForecastAdapter.getCursor();
-            if ( null != c ) {
-                c.moveToPosition(0);
-                String posLat = c.getString(COL_COORD_LAT);
-                String posLong = c.getString(COL_COORD_LONG);
-                Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLong);
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(geoLocation);
-
-                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivity(intent);
-                } else {
-                    Log.d(LOG_TAG, "Couldn't call " + geoLocation.toString() + ", no receiving apps installed!");
-                }
-            }
-
-        }
-    }
+//    private void openPreferredLocationInMap() {
+//        // Using the URI scheme for showing a location found on a map.  This super-handy
+//        // intent can is detailed in the "Common Intents" page of Android's developer site:
+//        // http://developer.android.com/guide/components/intents-common.html#Maps
+//        if ( null != mForecastAdapter ) {
+//            Cursor c = mForecastAdapter.getCursor();
+//            if ( null != c ) {
+//                c.moveToPosition(0);
+//                String posLat = c.getString(COL_COORD_LAT);
+//                String posLong = c.getString(COL_COORD_LONG);
+//                Uri geoLocation = Uri.parse("geo:" + posLat + "," + posLong);
+//
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setData(geoLocation);
+//
+//                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+//                    startActivity(intent);
+//                } else {
+//                    Log.d(LOG_TAG, "Couldn't call " + geoLocation.toString() + ", no receiving apps installed!");
+//                }
+//            }
+//
+//        }
+//    }
 
     @Override
     public void onResume() {
         super.onResume();
         if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
-            getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+            getLoaderManager().restartLoader(TIMETABLE_LOADER, null, this);
         }
     }
 
@@ -312,41 +360,52 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.d(LOG_TAG, "CURSOR");
+
+        String URL = "content://com.nutjane.android.MUTram/timetable";
+        Uri uri = Uri.parse(URL);
+        return new CursorLoader(getActivity(),uri,null,null,null,null);
+
+
         // This is called when a new Loader needs to be created.  This
         // fragment only uses one loader, so we don't care about checking the id.
 
         // To only show current and future dates, get the String representation for today,
         // and filter the query to return weather only for dates after or including today.
         // Only return data after today.
-        String startDate = WeatherContract.getDbDateString(new Date());
+//        String startDate = TimetableContract.getDbDateString(new Date());
 
         // Sort order:  Ascending, by date.
-        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+//        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+//
+//        mLocation = Utility.getPreferredLocation(getActivity());
+//       // Uri timetableForTramUri = TimetableEntry.buildTimeUriWithTramID(mLocation);
+//
+//        Uri timetableForTramUri = TimetableEntry.buildTimeUriWithTramID("1");
+//
+//         Log.d(LOG_TAG, "IN LOADER with"+ timetableForTramUri.t);
+//
+//        // Now create and return a CursorLoader that will take care of
+//        // creating a Cursor for the data being displayed.
+//        return new CursorLoader(
+//                getActivity(),
+//                timetableForTramUri,
+//                TIMETABLE_COLUMN,
+//                null,
+//                null,
+//                null
+//        );
 
-        mLocation = Utility.getPreferredLocation(getActivity());
-        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(
-                mLocation, startDate);
-
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(
-                getActivity(),
-                weatherForLocationUri,
-                FORECAST_COLUMNS,
-                null,
-                null,
-                sortOrder
-        );
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mForecastAdapter.swapCursor(data);
-        if (mPosition != ListView.INVALID_POSITION) {
-            // If we don't need to restart the loader, and there's a desired position to restore
-            // to, do so now.
-            mListView.smoothScrollToPosition(mPosition);
-        }
+//        mForecastAdapter.swapCursor(data);
+//        if (mPosition != ListView.INVALID_POSITION) {
+//            // If we don't need to restart the loader, and there's a desired position to restore
+//            // to, do so now.
+//            mListView.smoothScrollToPosition(mPosition);
+//        }
     }
 
     @Override
@@ -354,10 +413,5 @@ public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor
         mForecastAdapter.swapCursor(null);
     }
 
-    public void setUseTodayLayout(boolean useTodayLayout){
-        mUseTodayLayout = useTodayLayout;
-        if(mForecastAdapter != null){
-            mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
-        }
-    }
+
 }

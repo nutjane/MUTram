@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.android.sunshine" >
+    package="com.nutjane.android.MUTram" >
     <uses-sdk android:minSdkVersion="11" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -20,7 +20,7 @@
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name="com.example.android.sunshine.MainActivity"
+            android:name="com.nutjane.android.MUTram.MainActivity"
             android:theme="@style/ForecastTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,26 +29,26 @@
         </activity>
 
         <activity
-            android:name="com.example.android.sunshine.DetailsActivity"
+            android:name="com.nutjane.android.MUTram.DetailsActivity"
             android:label="@string/title_activity_details"
-            android:parentActivityName="com.example.android.sunshine.MainActivity" >
+            android:parentActivityName="com.nutjane.android.MUTram.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.sunshine.MainActivity" />
+                android:value="com.nutjane.android.MUTram.MainActivity" />
         </activity>
 
         <activity
-            android:name="com.example.android.sunshine.SettingsActivity"
+            android:name="com.nutjane.android.MUTram.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="com.example.android.sunshine.MainActivity" >
+            android:parentActivityName="com.nutjane.android.MUTram.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.sunshine.MainActivity" />
+                android:value="com.nutjane.android.MUTram.MainActivity" />
         </activity>
 
         <provider
-            android:authorities="com.example.android.sunshine"
-            android:name=".data.WeatherProvider"
+            android:authorities="com.nutjane.android.MUTram"
+            android:name=".data.TimetableProvider"
             android:exported="false"
             android:syncable="true" />
 

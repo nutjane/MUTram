@@ -2,16 +2,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.sunshine.ForecastFragment">
+    tools:context="com.nutjane.android.MUTram.TimetableFragment">
 
     <!-- An invisible view aligned to the center of the parent. Allows other
     views to be arranged on either side -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
+
+        <TextView
+            android:id="@+id/main_welcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"/>
+
+        </LinearLayout>
+
+
     <ListView
      style="@style/ForecastListStyle"
         android:id="@+id/listview_forecast"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
         android:divider="@null"
+        android:layout_marginTop="30dp"
     />
 
 

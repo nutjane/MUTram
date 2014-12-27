@@ -6,7 +6,7 @@
          It's to keep this short, so your launcher icon isn't displayed with "The greatest Wea"
          or something similar.
     -->
-    <string name="app_name">Sunshine</string>
+    <string name="app_name">MUTram</string>
 
     <!--
          By convention, "action" denotes that this String will be used as the label for an Action,
@@ -112,8 +112,8 @@
         <xliff:g id="low">%4$s</xliff:g></string>
 
     <!-- SyncAdapter related -->
-    <string name="sync_account_type">sunshine.example.com</string>
-    <string name="content_authority">"com.example.android.sunshine"</string>
+    <string name="sync_account_type">mutram.nutjane.com</string>
+    <string name="content_authority">"com.nutjane.android.mutram"</string>
 
     <!-- Notification Format -->
     <string name="format_notification">
