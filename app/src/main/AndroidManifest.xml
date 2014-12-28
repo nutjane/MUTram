@@ -40,11 +40,19 @@
         <activity
             android:name="com.nutjane.android.MUTram.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:theme="@android:style/Theme.Holo.Light.Dialog"
             android:parentActivityName="com.nutjane.android.MUTram.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nutjane.android.MUTram.MainActivity" />
         </activity>
+
+        <activity
+            android:name="com.nutjane.android.MUTram.PreferenceActivity"
+            android:label="@string/title_activity_preference"
+            android:theme="@android:style/Theme.Holo.Light.Dialog">
+
+            </activity>
 
         <provider
             android:authorities="com.nutjane.android.MUTram"

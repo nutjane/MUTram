@@ -5,84 +5,129 @@
 
     <LinearLayout
         android:gravity="center_vertical"
-        android:layout_gravity="left"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        >
 
-        <!-- Header: Day, Date -->
-        <TextView
-            android:text="สายสีน้ำเงิน"
-            android:fontFamily="sans-serif-condensed"
-            android:id="@+id/detail_tram_bigname"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
 
-        <TextView
-            android:text="MLC-หน้ามอ"
-            android:fontFamily="sans-serif-condensed"
-            android:id="@+id/detail_tram_route"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textColor="@color/grey_700"
-            android:textSize="16sp" />
-
-        <!-- Main content:  -->
         <LinearLayout
-            android:layout_height="match_parent"
-            android:layout_marginTop="16dp"
+            android:id="@+id/detail_tram_header"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            >
+
+
+                <TextView
+                    android:id="@+id/detail_tram_name"
+                    android:text="@string/blue_line_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"/>
+                <TextView
+                    android:id="@+id/detail_tram_desc"
+                    android:text="@string/blue_line_des"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/grey"
+                    android:textSize="16sp" />
+
+
+        </LinearLayout>
+
+
+        <!--- separate -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/blueLine_area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center">
+            android:paddingTop="15dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_marginBottom="15dp">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <ImageView
-                android:src="@drawable/art_clear"
-                android:id="@+id/detail_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical">
+                <TextView
+                    android:text="@string/your_location"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/grey_700"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/detail_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/blue_line_name"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"/>
 
 
             </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/grey_700"
+                    android:text="@string/arrival_time"/>
+                <TextView
+                    android:id="@+id/detail_amount_min"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="18:20"
+                    android:textSize="35sp"/>
+                <TextView
+                    android:id="@+id/detail_amount_min_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/black"
+                    android:text="18:20"
+                    android:textSize="35sp"/>
 
-            <TextView
-                android:text="5"
-                android:fontFamily="sans-serif-light"
-                android:id="@+id/detail_amount_min"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="96sp" />
-            <TextView
-                android:text="min"
-                android:fontFamily="sans-serif-light"
-                android:id="@+id/detail_text_min"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="20sp" />
+
+
 
             </LinearLayout>
-
-
-
 
 
 
 
         </LinearLayout>
+    </LinearLayout>
 
+
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="fitStart"
+            android:src="@drawable/map"
+            android:adjustViewBounds="true" />
 
     </LinearLayout>
 </ScrollView>

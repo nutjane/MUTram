@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="sunshine_light_blue">#ff64c2f4</color>
-    <color name="sunshine_blue">#ff1ca8f4</color>
+    <color name="orange">#ff8800</color>
+    <color name="orange_light">#ffbb33</color>
+    <color name="orange_light2">#ffcf99</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="grey_light">#e1e1df</color>
     <color name="grey">#cccccc</color>
+    <color name="grey_100">#747474</color>
     <color name="grey_700">#646464</color>
     <color name="black">#000000</color>
+
+    <color name="tram_red">#DF2121</color>
+    <color name="tram_green">#39845e</color>
+    <color name="tram_blue">#054aa4</color>
+
+    <color name="sunshine_light_blue">#DF2121</color>
+    <color name="sunshine_blue">#DF2121</color>
+
+
 </resources>

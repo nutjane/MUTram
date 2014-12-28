@@ -23,7 +23,11 @@ import android.view.MenuItem;
 
 public class DetailsActivity extends ActionBarActivity {
 
-    public static final String TRAMID_KEY = "forecast_date";
+    public static final String TRAMID_KEY = "TRAM_ID";
+    public static final String TIME_TRAM_COME = "timeTramCome";
+    public static final String TIME_TRAM_COME_NEXT = "timeTramCome_next";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +36,14 @@ public class DetailsActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            String date = getIntent().getStringExtra(TRAMID_KEY);
+            String tramID = getIntent().getStringExtra(TRAMID_KEY);
+            String timeCome = getIntent().getStringExtra(TIME_TRAM_COME);
+            String timeCome_next = getIntent().getStringExtra(TIME_TRAM_COME_NEXT);
 
             Bundle arguments = new Bundle();
-            arguments.putString(DetailsActivity.TRAMID_KEY, date);
+            arguments.putString(DetailsActivity.TRAMID_KEY, tramID);
+            arguments.putString(DetailsActivity.TIME_TRAM_COME, timeCome);
+            arguments.putString(DetailsActivity.TIME_TRAM_COME_NEXT, timeCome_next);
 
             DetailsFragment fragment = new DetailsFragment();
             fragment.setArguments(arguments);
@@ -49,7 +57,7 @@ public class DetailsActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_details, menu);
+//        getMenuInflater().inflate(R.menu.menu_details, menu);
         return true;
     }
 

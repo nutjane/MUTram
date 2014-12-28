@@ -16,13 +16,8 @@
 package com.nutjane.android.MUTram;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
@@ -32,56 +27,44 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.nutjane.android.MUTram.data.TimetableContract.TimetableEntry;
 
 
 /**
 * A placeholder fragment containing a simple view.
 */
-public class DetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailsFragment extends Fragment  {
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
 
     private static final String TIMETABLE_SHARE_HASHTAG = " #MUTramApp";
 
-    private static final String TRAMID_KEY = "location";
-//    private static final String LOCATION_KEY = "location";
+    public static final String TRAMID_KEY = "TRAM_ID";
+    public static final String TIME_TRAM_COME = "timeTramCome";
+    public static final String TIME_TRAM_COME_NEXT = "timeTramCome_next";
 
     private ShareActionProvider mShareActionProvider;
-    private String mTramID;
-    private String mTimetable;
+    private String mShareValue;
     private String mTimeStr;
-//    private String mLocation;
-//    private String mForecast;
-//    private String mDateStr;
+
+    private String mTramID_Value;
+    private String mTimeCome_Value;
+    private String mTimeCome_next_Value;
+    private String mLocaiton_Value;
 
 
     private static final int DETAIL_LOADER = 0;
 
-    private static final String[] TIMETABLE_COLUMN = {
-            TimetableEntry.TABLE_NAME + "." + TimetableEntry._ID,
-            TimetableEntry.COLUMN_TRAM_ID,
-            TimetableEntry.COLUMN_TRAM_NAME,
-            TimetableEntry.COLUMN_TIME
-    };
 
 
-    private TextView mFriendlyDateView;
-    private TextView mDateView;
-    private TextView mDescriptionView;
-    private TextView mHighTempView;
-    private TextView mLowTempView;
-    private TextView mHumidityView;
-    private TextView mWindView;
-    private TextView mPressureView;
-
-    private ImageView mIconView;
-    private TextView mTramRoute;
+    private TextView mTramDesc;
+    private TextView mLocation;
     private TextView mTramName;
     private TextView mTramTime;
+    private TextView mTramTime_next;
+    private LinearLayout mTramHeader;
+
 
     public DetailsFragment() {
         setHasOptionsMenu(true);
@@ -89,7 +72,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(TRAMID_KEY, mTramID);
+        outState.putString(TRAMID_KEY, mTramID_Value);
+        outState.putString(TIME_TRAM_COME, mTimeCome_Value);
+        outState.putString(TIME_TRAM_COME_NEXT, mTimeCome_next_Value);
+
         super.onSaveInstanceState(outState);
     }
 
@@ -99,38 +85,97 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            mTimeStr = arguments.getString(DetailsActivity.TRAMID_KEY);
+            mTramID_Value = arguments.getString(DetailsActivity.TRAMID_KEY);
+            mTimeCome_Value = arguments.getString(DetailsActivity.TIME_TRAM_COME);
+            mTimeCome_next_Value = arguments.getString(DetailsActivity.TIME_TRAM_COME_NEXT);
+
         }
 
         if (savedInstanceState != null) {
-            mTramID = savedInstanceState.getString(TRAMID_KEY);
+            mTramID_Value = savedInstanceState.getString(TRAMID_KEY);
+            mTimeCome_Value = savedInstanceState.getString(TIME_TRAM_COME);
+            mTimeCome_next_Value = savedInstanceState.getString(TIME_TRAM_COME_NEXT);
+
+        }
+
+        mLocaiton_Value = Utility.getPreferredLocation(getActivity());
+
+        View rootView = inflater.inflate(R.layout.fragment_details, container, false);
+        mTramName = (TextView) rootView.findViewById(R.id.detail_tram_name);
+        mTramDesc = (TextView) rootView.findViewById(R.id.detail_tram_desc);
+        mLocation = (TextView) rootView.findViewById(R.id.detail_location);
+        mTramHeader = (LinearLayout) rootView.findViewById(R.id.detail_tram_header);
+
+        mTramTime = (TextView) rootView.findViewById(R.id.detail_amount_min);
+        mTramTime_next = (TextView) rootView.findViewById(R.id.detail_amount_min_next);
+
+        String tramDesc="";
+        String tramName="";
+        //change detail header color
+        switch (Integer.parseInt(mTramID_Value)){
+            case 1: {
+                mTramHeader.setBackgroundColor(getResources().getColor(R.color.tram_blue));
+                tramName = getResources().getString(R.string.blue_line_name);
+                tramDesc = getResources().getString(R.string.blue_line_des);
+            } break;
+            case 2: {
+                mTramHeader.setBackgroundColor(getResources().getColor(R.color.tram_red));
+                tramName = getResources().getString(R.string.red_line_name);
+                tramDesc = getResources().getString(R.string.red_line_des);
+            } break;
+            case 3: {
+                mTramHeader.setBackgroundColor(getResources().getColor(R.color.tram_green));
+                tramName = getResources().getString(R.string.green_line_name);
+                tramDesc = getResources().getString(R.string.green_line_des);
+            } break;
+        }
+
+        mTramName.setText(tramName);
+        mTramDesc.setText(tramDesc);
+        mLocation.setText(mLocaiton_Value);
+        mTramTime.setText(mTimeCome_Value);
+        mTramTime_next.setText(mTimeCome_next_Value);
+        setShareValue();
+
+
+        return rootView;
+    }
+
+    private void setShareValue(){
+        if(mTimeCome_Value.equals("-- : --")){
+            mShareValue = getResources().getString(R.string.share_no_tram);
+        }
+        else{
+            String tramName = "";
+            switch (Integer.parseInt(mTramID_Value)){
+                case 1: tramName = getResources().getString(R.string.blue_line_name); break;
+                case 2: tramName = getResources().getString(R.string.red_line_name); break;
+                case 3: tramName = getResources().getString(R.string.green_line_name); break;
+            }
+
+            mShareValue = String.format(getResources().getString(R.string.share_value)
+                    ,tramName,mLocaiton_Value,mTimeCome_Value);
         }
 
 
-        View rootView = inflater.inflate(R.layout.fragment_details, container, false);
-        mTramName = (TextView) rootView.findViewById(R.id.detail_tram_bigname);
-        mTramRoute = (TextView) rootView.findViewById(R.id.detail_tram_route);
-        mTramTime = (TextView) rootView.findViewById(R.id.detail_amount_min);
-        mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
-
-        return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(DetailsActivity.TRAMID_KEY) &&
-                mTramID != null &&
-                !mTramID.equals(Utility.getPreferredLocation(getActivity()))) {
-            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
-        }
+
+//        if (arguments != null && arguments.containsKey(DetailsActivity.TRAMID_KEY) &&
+//                mTramID != null &&
+//                !mTramID.equals(Utility.getPreferredLocation(getActivity()))) {
+//            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+//        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.v(LOG_TAG, "in onCreateOptionsMenu");
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         inflater.inflate(R.menu.detailfragment, menu);
 
         // Retrieve the share menu item
@@ -139,8 +184,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         // Get the provider and hold onto it to set/change the share intent.
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
+//        mShareActionProvider = (ShareActionProvider) menuItem.getActionProvider();
+
         // If onLoadFinished happens before this, we can go ahead and set the share intent now.
-        if (mTimetable != null) {
+        if (mShareValue != null) {
             mShareActionProvider.setShareIntent(createShareTimetableIntent());
         }
     }
@@ -150,7 +197,7 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mTimetable + TIMETABLE_SHARE_HASHTAG);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mShareValue + TIMETABLE_SHARE_HASHTAG);
         return shareIntent;
     }
 
@@ -158,98 +205,16 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
-            mTramID = savedInstanceState.getString(TRAMID_KEY);
+            mTramID_Value = savedInstanceState.getString(TRAMID_KEY);
+            mTimeCome_Value = savedInstanceState.getString(TIME_TRAM_COME);
+            mTimeCome_next_Value = savedInstanceState.getString(TIME_TRAM_COME_NEXT);
+
         }
 
-        Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(DetailsActivity.TRAMID_KEY)) {
-            getLoaderManager().initLoader(DETAIL_LOADER, null, this);
-        }    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        /*Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
-        if (intent == null || !intent.hasExtra(DetailsActivity.TRAMID_KEY)) {
-            return null;
-        }
-        String forecastDate = intent.getStringExtra(DetailsActivity.TRAMID_KEY);*/
-
-        // Sort order:  Ascending, by date.
-        String sortOrder = TimetableEntry.COLUMN_TIME + " ASC";
-
-        mTramID = Utility.getPreferredLocation(getActivity());
-        Uri timetableForTimeUri = TimetableEntry.buildTimeUriWithTramID(mTramID);
-        Log.v(LOG_TAG, timetableForTimeUri.toString());
-
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(
-                getActivity(),
-                timetableForTimeUri,
-                TIMETABLE_COLUMN,
-                null,
-                null,
-                sortOrder
-        );
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null && data.moveToFirst()) {
-
-
-            // Read weather condition ID from cursor
-            int tramID = data.getInt(data.getColumnIndex(TimetableEntry.COLUMN_TRAM_ID));
-            // Use ART(COLOR) Image
-            mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(tramID));
-
-
-            // Read tram name from cursor and update view
-            String tramName = data.getString(data.getColumnIndex(
-                    TimetableEntry.COLUMN_TRAM_NAME));
-            mDescriptionView.setText(tramName);
-
-            //For accessibility, add a content description to the icon field
-            mIconView.setContentDescription(tramName);
 
 
 
-            String tramTime = data.getString(data.getColumnIndex(TimetableEntry.COLUMN_TIME));
-            mTramTime.setText(tramTime);
 
-//            // Read low temperature from cursor and update view
-//            double low = data.getDouble(data.getColumnIndex(WeatherEntry.COLUMN_MIN_TEMP));
-//            String lowString = Utility.formatTemperature(getActivity(), low);
-//            mLowTempView.setText(lowString);
-//
-//            // Read humidity from cursor and update view
-//            float humidity = data.getFloat(data.getColumnIndex(WeatherEntry.COLUMN_HUMIDITY));
-//            mHumidityView.setText(getActivity().getString(R.string.format_humidity, humidity));
-//
-//            // Read wind speed and direction from cursor and update view
-//            float windSpeedStr = data.getFloat(data.getColumnIndex(WeatherEntry.COLUMN_WIND_SPEED));
-//            float windDirStr = data.getFloat(data.getColumnIndex(WeatherEntry.COLUMN_DEGREES));
-//            mWindView.setText(Utility.getFormattedWind(getActivity(), windSpeedStr, windDirStr));
-//
-//            // Read pressure from cursor and update view
-//            float pressure = data.getFloat(data.getColumnIndex(WeatherEntry.COLUMN_PRESSURE));
-//            mPressureView.setText(getActivity().getString(R.string.format_pressure, pressure));
-
-            // We still need this for the share intent
-            mTimetable = String.format("%s - %s", tramName, tramTime);
-
-            Log.v(LOG_TAG, "Forecast String: " + mTimetable);
-
-
-
-            // If onCreateOptionsMenu has already happened, we need to update the share intent now.
-            if (mShareActionProvider != null) {
-                mShareActionProvider.setShareIntent(createShareTimetableIntent());
-            }
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) { }
 }

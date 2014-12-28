@@ -12,24 +12,29 @@
          By convention, "action" denotes that this String will be used as the label for an Action,
          typically from the action bar.  The ActionBar is limited real estate, so shorter is better.
     -->
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">เปลี่ยนตำแหน่ง</string>
     <string name="action_map">Map Location</string>
-    <string name="action_share">Share</string>
+    <string name="action_share">แชร์</string>
     <!-- Menu label to fetch updated weather info from the server -->
     <string name="action_refresh" translatable="false">Refresh</string>
 
-    <string name="title_activity_details">Details</string>
+    <string name="title_activity_details">รายละเอียด</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_preference">ตำแหน่งของคุณ</string>
 
 
-    <!-- Strings for formatting weather-related data -->
+
+    <!-- Strings for location data -->
     <string-array name="pref_location_values">
         <item>op,5,10,15</item>
         <item>ict,10,20,30</item>
+        <item>condo,10,-1,-1</item>
+
     </string-array>
     <string-array name="pref_location_options">
         <item>อธิการบดี</item>
         <item>ICT</item>
+        <item>คอนโด</item>
     </string-array>
 
 
@@ -58,7 +63,29 @@
 
 
 
-    <string name="your_location">ตำแหน่งของคุณ</string>
+    <string name="your_location">ฉันอยู่ที่ :</string>
+
+
+    <string name="blue_line_name">สายสีน้ำเงิน</string>
+    <string name="blue_line_des">MLC - หน้ามอ</string>
+    <string name="red_line_name">สายสีแดง</string>
+    <string name="red_line_des">MLC-หน้ามอ</string>
+    <string name="green_line_name">สายสีเขียว</string>
+    <string name="green_line_des">MLC-หน้ามอ</string>
+
+
+    <string name="arrival_time">เวลามาถึง</string>
+    <string name="next_tram">คันต่อไป</string>
+
+    <string name="share_value">กำลังรอรถแทรม %1$s คันต่อไป จะมาถึงที่ป้าย %2$s เวลา %3$s น.</string>
+
+    <string name="share_no_tram">วันนี้ไม่มีแทรมให้บริการแล้วครับ</string>
+
+    <string name="no_tram_pass_toast">แทรมบางสายไมได้ผ่านเส้นทาง</string>
+    <string name="no_tram_pass">- ไม่ผ่านเส้นทางนี้ -</string>
+
+
+
 
     <!-- Date format [CHAR LIMIT=NONE] -->
     <string name="format_full_friendly_date">
@@ -102,12 +129,5 @@
 
     <!-- Strings related to Notification preference -->
     <string name="pref_last_notification">last_notification</string>
-
-    <string name="blue_line_name">สายสีน้ำเงิน</string>
-    <string name="blue_line_des">MLC-หน้ามอ</string>
-
-
-    <string name="arrival_time">เวลามาถึง</string>
-    <string name="next_tram">คันต่อไป</string>
 
 </resources>

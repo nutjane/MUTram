@@ -16,6 +16,7 @@
 package com.nutjane.android.MUTram;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,14 +54,21 @@ public class
 
     private ListView mListView;
 
-    private TextView mtextBlueArrival;
-    private TextView mtextBlueArrivalNext;
-    private TextView mtextRedArrival;
-    private TextView mtextRedArrivalNext;
-    private TextView mtextGreenArrival;
-    private TextView mtextGreenArrivalNext;
+    static class ViewHolder{
+         LinearLayout mtextBlueArea;
+         TextView mtextBlueArrival;
+         TextView mtextBlueArrivalNext;
+         LinearLayout mtextRedArea;
+         TextView mtextRedArrival;
+         TextView mtextRedArrivalNext;
+         LinearLayout mtextGreenArea;
+         TextView mtextGreenArrival;
+         TextView mtextGreenArrivalNext;
+         TextView mtextPrefLocation;
 
-    private TextView mtextPrefLocation;
+    }
+
+
 
     private int mPosition = ListView.INVALID_POSITION;
     private boolean mUseTodayLayout;
@@ -121,7 +130,7 @@ public class
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.forecastfragment, menu);
+        inflater.inflate(R.menu.timetablefragment, menu);
     }
 
     @Override
@@ -130,14 +139,6 @@ public class
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        /*if (id == R.id.action_refresh) {
-            updateWeather();
-            return true;
-        }*/
-        /*if (id == R.id.action_map) {
-            openPreferredLocationInMap();
-            return true;
-        }*/
         return super.onOptionsItemSelected(item);
     }
 
@@ -173,27 +174,95 @@ public class
 
                 }
 
-                Toast.makeText(getActivity(),
-                        c.getString(c.getColumnIndex(TimetableProvider._ID)) +
-                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TRAM_ID)) +
-                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TRAM_NAME)) +
-                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TIME)),
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(),
+//                        c.getString(c.getColumnIndex(TimetableProvider._ID)) +
+//                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TRAM_ID)) +
+//                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TRAM_NAME)) +
+//                                ", " + c.getString(c.getColumnIndex(TimetableProvider.TIME)),
+//                        Toast.LENGTH_SHORT).show();
             } while (c.moveToNext());
         }
-
+        ViewHolder holder = new ViewHolder();
 
         mLocation = Utility.getPreferredLocation(getActivity());
-        mtextPrefLocation = (TextView) rootView.findViewById(R.id.main_pref_location);
-        mtextPrefLocation.setText(mLocation);
+        holder.mtextPrefLocation = (TextView) rootView.findViewById(R.id.main_pref_location);
+        holder.mtextPrefLocation.setText(mLocation);
+        holder.mtextPrefLocation.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){ //change location
+                Intent settingsActivity = new Intent(getActivity(),
+                        PreferenceActivity.class);
+                startActivity(settingsActivity);
+
+            }
+        });
+
+
+
         calculation(1,line1,0);
         calculation(2,line2,2);
         calculation(3,line3,4);
 
-        mtextBlueArrival = (TextView) rootView.findViewById(R.id.blueLine_arrival);
-        mtextBlueArrival.setText(timeTramCome[0]);
-        mtextBlueArrivalNext = (TextView) rootView.findViewById(R.id.blueLine_arrival_next);
-        mtextBlueArrivalNext.setText(timeTramCome[1]);
+        holder.mtextBlueArrival = (TextView) rootView.findViewById(R.id.blueLine_arrival);
+        holder.mtextBlueArrival.setText(timeTramCome[0]);
+        holder.mtextBlueArrivalNext = (TextView) rootView.findViewById(R.id.blueLine_arrival_next);
+        holder.mtextBlueArrivalNext.setText(timeTramCome[1]);
+
+        holder.mtextBlueArea = (LinearLayout) rootView.findViewById(R.id.blueLine_area);
+        holder.mtextBlueArea.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Toast.makeText(getActivity(),"CLICK",Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, "IN CLICK");
+
+                Intent detail = new Intent(getActivity(),DetailsActivity.class);
+                detail.putExtra("TRAM_ID","1");
+                detail.putExtra("timeTramCome",timeTramCome[0]);
+                detail.putExtra("timeTramCome_next",timeTramCome[1]);
+                startActivity(detail);
+
+            }
+         });
+
+        holder.mtextRedArrival = (TextView) rootView.findViewById(R.id.redLine_arrival);
+        holder.mtextRedArrival.setText(timeTramCome[2]);
+        holder.mtextRedArrivalNext = (TextView) rootView.findViewById(R.id.redLine_arrival_next);
+        holder.mtextRedArrivalNext.setText(timeTramCome[3]);
+
+        holder.mtextRedArea = (LinearLayout) rootView.findViewById(R.id.redLine_area);
+        holder.mtextRedArea.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Toast.makeText(getActivity(),"CLICK",Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, "IN CLICK");
+
+                Intent detail = new Intent(getActivity(),DetailsActivity.class);
+                detail.putExtra("TRAM_ID","2");
+                detail.putExtra("timeTramCome",timeTramCome[2]);
+                detail.putExtra("timeTramCome_next",timeTramCome[3]);
+                startActivity(detail);
+
+            }
+        });
+
+        holder.mtextGreenArrival = (TextView) rootView.findViewById(R.id.greenLine_arrival);
+        holder.mtextGreenArrival.setText(timeTramCome[4]);
+        holder.mtextGreenArrivalNext = (TextView) rootView.findViewById(R.id.greenLine_arrival_next);
+        holder.mtextGreenArrivalNext.setText(timeTramCome[5]);
+
+        holder.mtextGreenArea = (LinearLayout) rootView.findViewById(R.id.greenLine_area);
+        holder.mtextGreenArea.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Toast.makeText(getActivity(),"CLICK",Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, "IN CLICK");
+
+                Intent detail = new Intent(getActivity(),DetailsActivity.class);
+                detail.putExtra("TRAM_ID","3");
+                detail.putExtra("timeTramCome",timeTramCome[4]);
+                detail.putExtra("timeTramCome_next",timeTramCome[5]);
+                startActivity(detail);
+
+            }
+        });
+
+
 
         return rootView;
     }
@@ -206,21 +275,41 @@ public class
 
     private void changeLocation(){
 
+        ViewHolder holder = new ViewHolder();
         mLocation = Utility.getPreferredLocation(getActivity());
-        mtextPrefLocation = (TextView) getView().findViewById(R.id.main_pref_location);
-        mtextPrefLocation.setText(mLocation);
+        holder.mtextPrefLocation = (TextView) getView().findViewById(R.id.main_pref_location);
+        holder.mtextPrefLocation.setText(mLocation);
         calculation(1,line1,0);
         calculation(2,line2,2);
         calculation(3,line3,4);
-        mtextBlueArrival = (TextView) getView().findViewById(R.id.blueLine_arrival);
-        mtextBlueArrival.setText(timeTramCome[0]);
-        mtextBlueArrivalNext = (TextView) getView().findViewById(R.id.blueLine_arrival_next);
-        mtextBlueArrivalNext.setText(timeTramCome[1]);
+        holder.mtextBlueArrival = (TextView) getView().findViewById(R.id.blueLine_arrival);
+        holder.mtextBlueArrival.setText(timeTramCome[0]);
+        holder.mtextBlueArrivalNext = (TextView) getView().findViewById(R.id.blueLine_arrival_next);
+        holder.mtextBlueArrivalNext.setText(timeTramCome[1]);
+        holder.mtextRedArrival = (TextView) getView().findViewById(R.id.redLine_arrival);
+        holder.mtextRedArrival.setText(timeTramCome[2]);
+        holder.mtextRedArrivalNext = (TextView) getView().findViewById(R.id.redLine_arrival_next);
+        holder.mtextRedArrivalNext.setText(timeTramCome[3]);
+        holder.mtextGreenArrival = (TextView) getView().findViewById(R.id.greenLine_arrival);
+        holder.mtextGreenArrival.setText(timeTramCome[4]);
+        holder.mtextGreenArrivalNext = (TextView) getView().findViewById(R.id.greenLine_arrival_next);
+        holder.mtextGreenArrivalNext.setText(timeTramCome[5]);
+
 
     }
 
     private void calculation(int tramID, ArrayList<String> line, int st){
 
+
+        int addLine = Integer.parseInt(Utility.getPreferredAddtimeTram(getActivity(),tramID));
+        if(addLine == -1){ //if tram doesn't pass that location
+            timeTramCome[st] = "-- : --";
+            timeTramCome[st+1] = "-- : --";
+            Toast.makeText(getActivity(),getResources().getText(R.string.no_tram_pass)
+                    ,Toast.LENGTH_SHORT).show();
+            return;
+
+        }
 
         //nowTime
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
@@ -228,15 +317,25 @@ public class
         Calendar calTramCome = Calendar.getInstance();
 
 
-        int addLine = Integer.parseInt(Utility.getPreferredAddtimeTram(getActivity(),tramID));
-        int position=0;
+        Log.d(LOG_TAG, "TRAMID: "+tramID+" ADD+" + addLine+ "  NOW:"+df.format(calNow.getTime()));
+
+        int position=-1;
         int amountLoop = line.size();
         for(int i=0;i<amountLoop;i++) {
+
+            String get = line.get(i);
+            Log.d(LOG_TAG, tramID + " " +get);
             String[] time = line.get(i).split(":");
-            calTramCome.set(Calendar.HOUR,Integer.parseInt(time[0]));
+            Log.d(LOG_TAG, time[0] + " " +time[1]);
+
+            calTramCome.set(Calendar.HOUR_OF_DAY,Integer.parseInt(time[0]));
             calTramCome.set(Calendar.MINUTE,Integer.parseInt(time[1]));
+            Log.d(LOG_TAG, "TIME OUT>: "+df.format(calTramCome.getTime()));
+
 //                System.out.println("T "+i+" "+calTramCome.getTime());
             calTramCome.add(Calendar.MINUTE, addLine);
+            Log.d(LOG_TAG, "TIME ARRIVE>: "+df.format(calTramCome.getTime()));
+
 //                System.out.println("Ta"+i+" "+calTramCome.getTime());
             if (calTramCome.after(calNow)) {
                 position = i;
@@ -244,17 +343,34 @@ public class
             }
         }
 
-//            System.out.println(df.format(calTramCome.getTime()));
-        timeTramCome[st] = (df.format(calTramCome.getTime()));
-        Log.d(LOG_TAG, st + ": " +timeTramCome[st]);
-        String[] time = line.get(position+1).split(":");
-        calTramCome.set(Calendar.HOUR,Integer.parseInt(time[0]));
-        calTramCome.set(Calendar.MINUTE,Integer.parseInt(time[1]));
-        calTramCome.add(Calendar.MINUTE, addLine);
-        timeTramCome[st+1]=(df.format(calTramCome.getTime()));
-        Log.d(LOG_TAG, st + ": " +timeTramCome[st+1]);
-//            System.out.println(df.format(calTramCome.getTime()));
+        Log.d(LOG_TAG, "position : " +position);
 
+        if(position==-1){ //no tram found for this day
+            timeTramCome[st] = "-- : --";
+        }
+        else {
+            timeTramCome[st] = (df.format(calTramCome.getTime()));
+        }
+        Log.d(LOG_TAG, st + ": " +timeTramCome[st]);
+
+        //calculation for the next tarm
+        if(position+1 == line.size() || position == -1){ //if it is out of bound or no tram
+            timeTramCome[st+1] = "-- : --";
+
+        }
+        else {
+            String[] time = line.get(position+1).split(":");
+            calTramCome.set(Calendar.HOUR_OF_DAY,Integer.parseInt(time[0]));
+            calTramCome.set(Calendar.MINUTE,Integer.parseInt(time[1]));
+            calTramCome.add(Calendar.MINUTE, addLine);
+            timeTramCome[st+1]=(df.format(calTramCome.getTime()));
+        }
+        Log.d(LOG_TAG, (st+1) + ": " +timeTramCome[st+1]);
+
+
+
+
+        Log.d(LOG_TAG, " ");
 
 
     }
