@@ -28,7 +28,6 @@ public class TimetableProvider extends ContentProvider {
 
     public static final String _ID = "_id";
     public static final String TRAM_ID = "tram_id";
-    public static final String TRAM_NAME = "tram_name";
     public static final String TIME = "time";
 
     public static final String LOG_TAG = TimetableProvider.class.getSimpleName();
@@ -242,5 +241,9 @@ public class TimetableProvider extends ContentProvider {
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
+    }
+
+    public static String getURLProvider(){
+        return URL;
     }
 }

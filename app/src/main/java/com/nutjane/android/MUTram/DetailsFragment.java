@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,11 +28,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
-/**
-* A placeholder fragment containing a simple view.
-*/
 public class DetailsFragment extends Fragment  {
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
@@ -46,17 +43,13 @@ public class DetailsFragment extends Fragment  {
 
     private ShareActionProvider mShareActionProvider;
     private String mShareValue;
-    private String mTimeStr;
 
     private String mTramID_Value;
     private String mTimeCome_Value;
     private String mTimeCome_next_Value;
     private String mLocaiton_Value;
 
-
     private static final int DETAIL_LOADER = 0;
-
-
 
     private TextView mTramDesc;
     private TextView mLocation;
@@ -90,14 +83,12 @@ public class DetailsFragment extends Fragment  {
             mTimeCome_next_Value = arguments.getString(DetailsActivity.TIME_TRAM_COME_NEXT);
 
         }
-
         if (savedInstanceState != null) {
             mTramID_Value = savedInstanceState.getString(TRAMID_KEY);
             mTimeCome_Value = savedInstanceState.getString(TIME_TRAM_COME);
             mTimeCome_next_Value = savedInstanceState.getString(TIME_TRAM_COME_NEXT);
 
         }
-
         mLocaiton_Value = Utility.getPreferredLocation(getActivity());
 
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
@@ -137,6 +128,15 @@ public class DetailsFragment extends Fragment  {
         mTramTime_next.setText(mTimeCome_next_Value);
         setShareValue();
 
+        //notify no tram
+        if(mTimeCome_Value.equals("-- : --")) Toast.makeText(getActivity()
+                , getResources().getText(R.string.share_no_tram)
+                , Toast.LENGTH_SHORT).show();
+        if(mTimeCome_Value.equals("X")) Toast.makeText(getActivity()
+                , getResources().getText(R.string.this_route_no_tram)
+                , Toast.LENGTH_SHORT).show();
+
+
 
         return rootView;
     }
@@ -160,21 +160,9 @@ public class DetailsFragment extends Fragment  {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Bundle arguments = getArguments();
-
-//        if (arguments != null && arguments.containsKey(DetailsActivity.TRAMID_KEY) &&
-//                mTramID != null &&
-//                !mTramID.equals(Utility.getPreferredLocation(getActivity()))) {
-//            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
-//        }
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.v(LOG_TAG, "in onCreateOptionsMenu");
 
         inflater.inflate(R.menu.detailfragment, menu);
 
@@ -184,9 +172,6 @@ public class DetailsFragment extends Fragment  {
         // Get the provider and hold onto it to set/change the share intent.
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
-//        mShareActionProvider = (ShareActionProvider) menuItem.getActionProvider();
-
-        // If onLoadFinished happens before this, we can go ahead and set the share intent now.
         if (mShareValue != null) {
             mShareActionProvider.setShareIntent(createShareTimetableIntent());
         }
@@ -212,8 +197,6 @@ public class DetailsFragment extends Fragment  {
         }
 
     }
-
-
 
 
 
